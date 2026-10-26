@@ -102,3 +102,14 @@ test("limits repeat submissions", async () => {
   }
   assert.equal(result!.status, 429);
 });
+
+test("uses Vercel's client IP header when the Cloudflare IP header is absent", async () => {
+  let result: Response;
+  for (let i = 0; i < 6; i++) {
+    const r = request();
+    r.headers.delete("CF-Connecting-IP");
+    r.headers.set("x-vercel-forwarded-for", "vercel-rate-limit-test");
+    result = await handleContact(r, {});
+  }
+  assert.equal(result!.status, 429);
+});

@@ -39,7 +39,11 @@ export async function handleContact(
     });
   if (!request.headers.get("Content-Type")?.startsWith("application/json"))
     return reply(415, { error: "Please submit the enquiry form." });
-  const ip = request.headers.get("CF-Connecting-IP") || "local";
+  const ip =
+    request.headers.get("CF-Connecting-IP") ||
+    request.headers.get("x-vercel-forwarded-for") ||
+    request.headers.get("x-forwarded-for") ||
+    "local";
   const now = Date.now();
   for (const [key, value] of buckets)
     if (value.until < now) buckets.delete(key);
